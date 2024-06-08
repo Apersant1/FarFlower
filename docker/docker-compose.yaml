@@ -1,11 +1,29 @@
-version: "3.0"
-
-
-volumes:
-
 
 services:
-
+  userDB:
+      image: postgres:14.1-alpine
+      restart: always
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=postgres
+      ports:
+        - "5432:5432"
+      networks:
+        - custom
+  # user-service:
+  #   build:
+  #     context: ../services/user-service
+  #     dockerfile: ./DockerFile
+  #   environment:
+  #     SECRET: ${JWT_SECRET}
+  #     POSTGRES_DSN: ${POSTGRES_DSN_ASYNC_USER}
+  #   ports:
+  #     - "5000:5000"
+  #   depends_on:
+  #     - userDB
+  #   networks:
+  #     - custom
 
 networks:
   custom:
