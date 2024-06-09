@@ -1,14 +1,14 @@
-
+import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI,Depends
 
 from fastapi.middleware.cors import CORSMiddleware
 from . import config
-from .db import DB_INITIALIZER
+from .db import DB_INITIALIZER, get_async_session
 
-
-from .routes import UserRouter
+from .models import User
+from .routes import UserRouter,FriendRouter
 
 cfg: config.Config = config.load_config()
 
@@ -35,3 +35,4 @@ app.add_middleware(
     allow_origins=['*']
 )
 app.include_router(UserRouter)
+app.include_router(FriendRouter)

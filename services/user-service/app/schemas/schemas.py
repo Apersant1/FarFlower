@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional, List
-
+from pydantic import BaseModel
 from fastapi_users import schemas
 
 
@@ -34,3 +34,23 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
+
+
+class FriendRequestBase(BaseModel):
+    class Config:
+        from_attributes = True
+   
+
+class FriendRequestSchemaCreate(FriendRequestBase):
+    sender_id: uuid.UUID
+    receiver_id: uuid.UUID
+    status: str
+    
+
+class FriendRequestSchemaRead(FriendRequestBase):
+    id: uuid.UUID
+    sender_id: uuid.UUID
+    receiver_id: uuid.UUID
+    status: str
+    
+
