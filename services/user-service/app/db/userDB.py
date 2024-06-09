@@ -1,31 +1,11 @@
 from datetime import datetime
 from typing import AsyncGenerator
 from fastapi import Depends
-from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP
-from sqlalchemy import UUID, ForeignKey
+from fastapi_users.db import SQLAlchemyUserDatabase
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
-
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-
-
-Base: DeclarativeMeta = declarative_base()
-
-
-class User(SQLAlchemyBaseUserTableUUID, Base):
-    __tablename__ = "users"
-    email = Column(String, nullable=False)
-    username = Column(String, nullable=False)
-    cutename = Column(String, nullable=True)
-    registered_at = Column(
-        TIMESTAMP, default=datetime.now())
-    hashed_password = Column(String(length=1024), nullable=False)
-    is_active = Column(Boolean, default=True, nullable=False)
-    is_superuser = Column(Boolean, default=False, nullable=False)
-    is_verified = Column(Boolean, default=False, nullable=False)
-
+from app.models.models import User, Base
 
 
 class DatabaseInitializer():
