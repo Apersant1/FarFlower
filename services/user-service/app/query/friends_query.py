@@ -5,7 +5,8 @@ from fastapi import APIRouter,Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_async_session
 from app.models import User, FriendRequest
-from app.schemas import FriendRequestSchemaRead, FriendRequestSchemaCreate, FriendRequestBase
+from app.schemas import FriendRequestSchemaRead,\
+    FriendRequestSchemaCreate, FriendRequestStatus
 from sqlalchemy.future import select
 
 
@@ -38,3 +39,13 @@ async def get_request_list(userID: uuid.UUID, db: AsyncSession) -> List[FriendRe
     req_list = await db.execute(select(FriendRequest).where(FriendRequest.receiver_id == userID))
     result = req_list.scalars().all()
     return result
+
+
+async def accept_request(requestID: uuid.UUID,
+                         status: FriendRequestStatus,
+                         db: AsyncSession):
+    request = await db.execute(select(FriendRequest).where(FriendRequest.id == requestID))
+    request = request.scalars().first()
+    request.status = status
+    await db.commit()
+    return request

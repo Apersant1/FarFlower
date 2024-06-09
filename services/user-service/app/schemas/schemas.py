@@ -1,4 +1,5 @@
 import uuid
+from enum import Enum
 from typing import Optional, List
 from pydantic import BaseModel
 from fastapi_users import schemas
@@ -41,16 +42,21 @@ class FriendRequestBase(BaseModel):
         from_attributes = True
    
 
+class FriendRequestStatus(str, Enum):
+    pending = 'pending'
+    rejected = 'rejected'
+    accepted = 'accepted'
+    
 class FriendRequestSchemaCreate(FriendRequestBase):
     sender_id: uuid.UUID
     receiver_id: uuid.UUID
-    status: str
+    status: FriendRequestStatus = FriendRequestStatus.pending
     
 
 class FriendRequestSchemaRead(FriendRequestBase):
     id: uuid.UUID
     sender_id: uuid.UUID
     receiver_id: uuid.UUID
-    status: str
+    status: FriendRequestStatus = FriendRequestStatus.pending
     
 

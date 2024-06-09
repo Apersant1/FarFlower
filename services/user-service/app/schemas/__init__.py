@@ -1,11 +1,12 @@
 from .schemas import UserRead, UserCreate, \
     UserUpdate, FriendRequestBase, \
-        FriendRequestSchemaCreate, FriendRequestSchemaRead
+        FriendRequestSchemaCreate, FriendRequestSchemaRead,FriendRequestStatus
 
 __all__ = [
     UserRead,
     UserCreate,
     FriendRequestBase,
     FriendRequestSchemaCreate,
-    FriendRequestSchemaRead
+    FriendRequestSchemaRead,
+    FriendRequestStatus
 ]
