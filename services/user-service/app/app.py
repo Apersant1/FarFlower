@@ -1,14 +1,11 @@
-import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
 from . import config
-from .db import DB_INITIALIZER, get_async_session
-
-from .models import User
-from .routes import UserRouter,FriendRouter
+from .db import DB_INITIALIZER
+from .routes import UserRouter, FriendRouter
 
 cfg: config.Config = config.load_config()
 
@@ -22,7 +19,7 @@ async def lifespan(app: FastAPI):
     # await create_db_and_tables()
     yield
     print("Ending")
-    
+
 app = FastAPI(
     version='0.0.1',
     title='User-Service',

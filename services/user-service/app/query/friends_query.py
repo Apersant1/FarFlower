@@ -1,15 +1,12 @@
 from typing import List
 import uuid
-from fastapi import APIRouter,Depends
-
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db import get_async_session
 from app.models import User, FriendRequest
-from app.schemas import FriendRequestSchemaRead,\
-    FriendRequestSchemaCreate, FriendRequestStatus
+from app.schemas import FriendRequestSchemaRead, FriendRequestStatus
 from sqlalchemy.future import select
 from sqlalchemy.sql import text
 from sqlalchemy import delete
+
 
 async def send_request(friendID: uuid.UUID,
                        db: AsyncSession,
@@ -22,12 +19,12 @@ async def send_request(friendID: uuid.UUID,
     if not receiver:
         return 2
     existing_request = await db.execute(select(FriendRequest)
-                                         .where(FriendRequest.sender_id == current_user.id,
-                                                FriendRequest.receiver_id == friendID))
+                                        .where(FriendRequest.sender_id == current_user.id,
+                                               FriendRequest.receiver_id == friendID))
     existing_request = existing_request.scalars().first()
     if existing_request:
         return 3
-    
+
     new_request = FriendRequest(id=uuid.uuid4(),
                                 sender_id=current_user.id,
                                 receiver_id=friendID,
@@ -35,6 +32,7 @@ async def send_request(friendID: uuid.UUID,
     db.add(new_request)
     await db.commit()
     return new_request
+
 
 async def get_request_list(userID: uuid.UUID,
                            db: AsyncSession
@@ -71,17 +69,16 @@ async def accept_request(requestID: uuid.UUID,
         return 3
 
 
-
 async def get_friends_list(current_user: dict, db: AsyncSession):
     statement_sender = text(f"""
-        SELECT u.* 
+        SELECT u.*
         FROM friend_requests fr
         JOIN users u ON fr.receiver_id = u.id
         WHERE fr.sender_id = '{current_user.id}'
         AND fr.status = 'accepted';
     """)
     statement_receiver = text(f"""
-        SELECT u.* 
+        SELECT u.*
         FROM friend_requests fr
         JOIN users u ON fr.sender_id = u.id
         WHERE fr.receiver_id = '{current_user.id}'
