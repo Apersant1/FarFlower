@@ -12,7 +12,7 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
-    
+
     class Config:
         from_attributes = True
 
@@ -47,16 +47,13 @@ class FriendRequestStatus(str, Enum):
     rejected = 'rejected'
     accepted = 'accepted'
     
+    
 class FriendRequestSchemaCreate(FriendRequestBase):
-    sender_id: uuid.UUID
     receiver_id: uuid.UUID
-    status: FriendRequestStatus = FriendRequestStatus.pending
     
 
 class FriendRequestSchemaRead(FriendRequestBase):
     id: uuid.UUID
     sender_id: uuid.UUID
     receiver_id: uuid.UUID
-    status: FriendRequestStatus = FriendRequestStatus.pending
-    
-
+    status: FriendRequestStatus 
