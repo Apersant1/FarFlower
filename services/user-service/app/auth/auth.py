@@ -12,7 +12,7 @@ class CustomJWTStrategy(JWTStrategy):
         data = {"sub": str(user.id), "aud": self.token_audience,
                 "is_superuser": user.is_superuser}
         return generate_jwt(
-            data, self.encode_key, self.lifetime_seconds,
+            data, self.secret, self.lifetime_seconds,
             algorithm=self.algorithm
         )
 
