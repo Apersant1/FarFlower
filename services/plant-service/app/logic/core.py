@@ -1,5 +1,6 @@
 from typing import List
 import uuid
+from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Plant
 from app.schemas import (
@@ -44,6 +45,17 @@ async def update_plant_property(
 ):
     updaing_plant = await db.execute(select(Plant).where(Plant.id == plantID))
     updaing_plant = updaing_plant.scalars().first()
-    updaing_plant.property = plant.property
-    await db.commit()
-    return updaing_plant
+    if updaing_plant is None:
+        raise HTTPException(status_code=404, detail="Plant not found")
+    if (
+        str(updaing_plant.owner) == current_user
+        or str(updaing_plant.parther) == current_user
+    ):
+        updaing_plant.property = plant.property
+        await db.commit()
+        return updaing_plant
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized to update this plant's property",
+        )

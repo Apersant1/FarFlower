@@ -3,6 +3,7 @@ from typing import Optional, List, Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.exceptions import HTTPException
+from httpx import HTTPError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_async_session
 from app.models import Plant
@@ -12,7 +13,7 @@ from app.schemas import (
     PlantUpdatePropSchemas,
 )
 from jose.jwt import decode
-from jose import JWTError
+from jose import JWTError, ExpiredSignatureError
 from app.config import Config, load_config
 from app.logic import (
     createPlant,
@@ -41,6 +42,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    expired_exception = HTTPException(
+        status_code=401,
+        detail="Token was expired",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = decode(
             token,
@@ -48,12 +54,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             audience="fastapi-users:auth",
             algorithms=["HS256"],
         )
-        username: str = payload.get("sub")
+        username: uuid.UUID = payload.get("sub")
         if username is None:
             raise credentials_exception
         return username
-    except JWTError as e:
-        raise e
+    except ExpiredSignatureError:
+        raise expired_exception
+    except JWTError:
+        raise credentials_exception
 
 
 @plant_router.post("/create", response_model=PlantReadSchemas)
@@ -75,7 +83,7 @@ async def get_user_plants(
 
 
 @plant_router.patch(
-    "/plant/property/{plant_id}", response_model=PlantReadSchemas
+    "/plant/property/{plant_id}", response_model=PlantUpdatePropSchemas
 )
 async def change_properties_plant(
     plant_id: uuid.UUID,
