@@ -11,7 +11,6 @@ class PlantBaseSchemas(BaseModel):
 
 class PlantCreateSchemas(PlantBaseSchemas):
     type: str
-    owner: uuid.UUID
     styles: Optional[dict]
     property: Optional[dict]
 
@@ -23,3 +22,7 @@ class PlantReadSchemas(PlantBaseSchemas):
     parther: Optional[uuid.UUID]
     styles: Optional[dict]
     property: Optional[dict]
+
+
+class PlantUpdatePropSchemas(PlantBaseSchemas):
+    property: dict
