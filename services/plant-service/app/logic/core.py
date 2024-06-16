@@ -41,7 +41,7 @@ async def update_plant_property(
     plantID: uuid.UUID,
     plant: PlantUpdatePropSchemas,
     db: AsyncSession,
-    current_user: str,
+    current_user: uuid.UUID,
 ):
     updaing_plant = await db.execute(select(Plant).where(Plant.id == plantID))
     updaing_plant = updaing_plant.scalars().first()
@@ -59,3 +59,16 @@ async def update_plant_property(
             status_code=403,
             detail="You are not authorized to update this plant's property",
         )
+
+
+async def remove_plant_by_id(
+    plantID, db: AsyncSession, current_user: uuid.UUID
+):
+    data = await db.execute(select(Plant).where(Plant.id == plantID))
+    data = data.scalars().first()
+    if str(data.owner) == current_user or str(data.parther) == current_user:
+        await db.execute(delete(Plant).where(Plant.id == plantID))
+        await db.commit()
+        return 1
+    else:
+        return 0

@@ -19,6 +19,7 @@ from app.logic import (
     createPlant,
     get_all_plant_by_user_id,
     update_plant_property,
+    remove_plant_by_id,
 )
 
 cfg: Config = load_config()
@@ -94,3 +95,21 @@ async def change_properties_plant(
     return await update_plant_property(
         plantID=plant_id, plant=plant, db=db, current_user=current_user
     )
+
+
+@plant_router.delete("/plant/{plant_id}")
+async def remove_plant(
+    plant_id: uuid.UUID,
+    current_user: Annotated[uuid.UUID, Depends(get_current_user)],
+    db: AsyncSession = Depends(get_async_session),
+):
+    response = await remove_plant_by_id(
+        plantID=plant_id, current_user=current_user, db=db
+    )
+    if response == 0:
+        return HTTPException(
+            status_code=403, detail="Forbidden: invalid plant_id"
+        )
+    elif response == 1:
+        return HTTPException(status_code=200, detail="Plant was removed")
+    return response
